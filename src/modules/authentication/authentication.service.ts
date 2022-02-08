@@ -1,4 +1,5 @@
 import CreateUserDto from './dto/createUser.dto';
+import * as bcrypt from 'bcrypt';
 import { getRepository } from 'typeorm';
 import UserEntity from '../../entities/user';
 
@@ -10,6 +11,13 @@ class AuthenticationService {
     await this.userRepository.save(newUser);
     newUser.password = undefined;
     return newUser;
+  };
+
+  public matchPassword = async (loginPassword, userPassword) => {
+    const isMatching = bcrypt.compareSync(loginPassword, userPassword);
+    if (isMatching) {
+      return true;
+    }
   };
 }
 
