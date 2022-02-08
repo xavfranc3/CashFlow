@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import { createConnection } from 'typeorm';
 import App from './app';
 import config from './ormconfig';
-import RootController from './root/root.controller';
+import RootController from './modules/root/root.controller';
 import validateEnv from './utils/validateEnv';
 
 validateEnv();
