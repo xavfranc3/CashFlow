@@ -9,7 +9,6 @@ class AuthenticationService {
   public registerUser = async (userData: CreateUserDto) => {
     const newUser = await this.userRepository.create(userData);
     await this.userRepository.save(newUser);
-    newUser.password = undefined;
     return newUser;
   };
 

@@ -27,7 +27,8 @@ class AuthenticationController implements Controller {
       res.status(403).json(`Email address ${userData.email} is already registered`);
     } else {
       const newUser: UserEntity = await this.authenticationService.registerUser(userData);
-      res.status(201).json(newUser);
+      const response = { id: newUser.id, name: newUser.name, email: newUser.email };
+      res.status(201).json(response);
     }
   };
 
@@ -40,8 +41,8 @@ class AuthenticationController implements Controller {
         user.password,
       );
       if (checkCredentials) {
-        user.password = undefined;
-        res.status(200).json(user);
+        const response = { id: user.id, name: user.name, email: user.email };
+        res.status(200).json(response);
       } else {
         res.status(403).send('Wrong credentials, request unauthorized');
       }
