@@ -1,5 +1,5 @@
 import * as express from 'express';
-import Controller from '../interfaces/controller.interface';
+import Controller from '../../interfaces/controller.interface';
 
 class RootController implements Controller {
   public path = '/';
