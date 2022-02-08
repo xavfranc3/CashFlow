@@ -19,6 +19,7 @@ class AuthenticationController implements Controller {
   private initializeRoutes() {
     this.router.post(`${this.path}/register`, this.registerUser);
     this.router.post(`${this.path}/login`, this.loginUser);
+    this.router.post(`${this.path}/logout`, this.logoutUser);
   }
 
   private registerUser = async (req: express.Request, res: express.Response) => {
@@ -41,14 +42,20 @@ class AuthenticationController implements Controller {
         user.password,
       );
       if (checkCredentials) {
-        const response = { id: user.id, name: user.name, email: user.email };
-        res.status(200).json(response);
+        const tokenData = this.authenticationService.createToken(user);
+        res.setHeader('Set-Cookie', this.authenticationService.createCookie(tokenData));
+        res.status(200).json(`User ${user.name} is logged in`);
       } else {
         res.status(403).send('Wrong credentials, request unauthorized');
       }
     } else {
       res.status(403).send('Wrong credentials, request unauthorized');
     }
+  };
+
+  private logoutUser = (req: express.Request, res: express.Response) => {
+    res.setHeader('Set-Cookie', ['Authorization=;Max-age=0']);
+    res.sendStatus(200);
   };
 }
 
