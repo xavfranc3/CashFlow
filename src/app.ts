@@ -1,6 +1,7 @@
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
 import Controller from './interfaces/controller.interface';
+import loggerMiddleware from './middlewares/logger';
 
 class App {
   public app: express.Application;
@@ -30,7 +31,7 @@ class App {
 
   private initializeControllers(controllers) {
     controllers.forEach((controller) => {
-      this.app.use('/api', controller.router);
+      this.app.use('/api', loggerMiddleware, controller.router);
     });
   }
 }
