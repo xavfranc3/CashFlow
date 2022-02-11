@@ -4,6 +4,7 @@ import * as cors from 'cors';
 import * as express from 'express';
 import Controller from './interfaces/controller.interface';
 import loggerMiddleware from './middlewares/logger';
+import errorMiddleware from './middlewares/error.middleware';
 
 class App {
   public app: express.Application;
@@ -15,6 +16,7 @@ class App {
 
     this.initializeMiddlewares();
     this.initializeControllers(controllers);
+    this.initializeErrorHandling();
   }
 
   public listen() {
@@ -31,6 +33,10 @@ class App {
     this.app.use(bodyParser.json());
     this.app.use(cookieParser());
     this.app.use(cors());
+  }
+
+  private initializeErrorHandling() {
+    this.app.use(errorMiddleware);
   }
 
   private initializeControllers(controllers) {
