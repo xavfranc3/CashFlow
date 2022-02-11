@@ -4,7 +4,7 @@ import { getRepository } from 'typeorm';
 import UserEntity from '../../entities/user';
 import IUser from '../users/user.interface';
 import * as jwt from 'jsonwebtoken';
-import TokenData from './tokenData.interface';
+import TokenData from './interfaces/tokenData.interface';
 import DataStoredInToken from './interfaces/dataStoredInToken.interface';
 
 class AuthenticationService {
