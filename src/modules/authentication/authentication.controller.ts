@@ -5,6 +5,9 @@ import UserEntity from '../../entities/user';
 import AuthenticationService from './authentication.service';
 import UserLoginDto from './dto/userLogin.dto';
 import UserService from '../users/user.service';
+import DuplicateUserEmail from '../../exceptions/DuplicateUserEmail';
+import WrongCredentials from '../../exceptions/WrongCredentials';
+import validationMiddleware from '../../middlewares/validation.middleware';
 
 class AuthenticationController implements Controller {
   public path = '/auth';
@@ -17,15 +20,15 @@ class AuthenticationController implements Controller {
   }
 
   private initializeRoutes() {
-    this.router.post(`${this.path}/register`, this.registerUser);
-    this.router.post(`${this.path}/login`, this.loginUser);
+    this.router.post(`${this.path}/register`, validationMiddleware(CreateUserDto), this.registerUser);
+    this.router.post(`${this.path}/login`, validationMiddleware(UserLoginDto), this.loginUser);
     this.router.post(`${this.path}/logout`, this.logoutUser);
   }
 
-  private registerUser = async (req: express.Request, res: express.Response) => {
+  private registerUser = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const userData: CreateUserDto = req.body;
     if (await this.userService.findUserByEmail(userData)) {
-      res.status(403).json(`Email address ${userData.email} is already registered`);
+      next(new DuplicateUserEmail(userData.email));
     } else {
       const newUser: UserEntity = await this.authenticationService.registerUser(userData);
       const response = { id: newUser.id, name: newUser.name, email: newUser.email };
@@ -33,7 +36,7 @@ class AuthenticationController implements Controller {
     }
   };
 
-  private loginUser = async (req: express.Request, res: express.Response) => {
+  private loginUser = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const loginData: UserLoginDto = req.body;
     const user = await this.userService.findUserByEmail(loginData);
     if (user) {
@@ -46,10 +49,10 @@ class AuthenticationController implements Controller {
         res.setHeader('Set-Cookie', this.authenticationService.createCookie(tokenData));
         res.status(200).json(`User ${user.name} is logged in`);
       } else {
-        res.status(403).send('Wrong credentials, request unauthorized');
+        next(new WrongCredentials());
       }
     } else {
-      res.status(403).send('Wrong credentials, request unauthorized');
+      next(new WrongCredentials());
     }
   };
 
